@@ -3,7 +3,7 @@ import "./style.css";
 const input = document.querySelector("input[type='search']");
 const container = document.querySelector(".cards");
 
-// Fetch data from the API
+
 async function getData(query) {
   try {
     const response = await fetch(
@@ -24,9 +24,8 @@ async function getData(query) {
   }
 }
 
-// Render game cards with images
 function renderCards(games) {
-  container.innerHTML = ""; // Clear existing cards
+  container.innerHTML = ""; 
 
   if (!games || games.length === 0) {
     container.innerHTML = `<p>No games found.</p>`;
@@ -55,7 +54,6 @@ function renderCards(games) {
   });
 }
 
-// Debounce search input so we don’t spam the API
 let timeout;
 input.addEventListener("input", () => {
   clearTimeout(timeout);
@@ -64,5 +62,4 @@ input.addEventListener("input", () => {
   }, 300);
 });
 
-// Initial load: show default results (e.g., “batman”)
 getData("batman");

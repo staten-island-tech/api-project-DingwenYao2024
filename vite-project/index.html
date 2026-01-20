@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CheapShark Game Deals</title>
 
-    <!-- Tailwind Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
@@ -18,7 +17,6 @@
       <h1 class="text-4xl font-bold text-center mb-8">CheapShark Game Deals</h1>
 
 
-      <!-- Search Bar -->
       <div class="mb-6 flex justify-center">
         <input
           id="search"
@@ -29,11 +27,8 @@
       </div>
 
 
-      <!-- Cards Container -->
       <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-
-      <!-- Error / No results -->
       <p id="message" class="text-center text-gray-600 mt-6"></p>
 
 
@@ -70,8 +65,6 @@
         container.innerHTML = "";
         message.textContent = "";
 
-
-        // If no results
         if (!games || games.length === 0) {
           message.textContent = "No games found.";
           return;
@@ -105,8 +98,6 @@
         });
       }
 
-
-      // Debounce logic to prevent too many API calls
       let timeout;
       input.addEventListener("input", () => {
         clearTimeout(timeout);
@@ -116,7 +107,6 @@
       });
 
 
-      // Initial load
       getData("batman");
     </script>
 
