@@ -9,26 +9,117 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body>
-    <h1 class="text-center text-8xl mb-8">Cheapshark Batman Games</h1>
-    <label class="input">
-  <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-    <g
-      stroke-linejoin="round"
-      stroke-linecap="round"
-      stroke-width="2.5"
-      fill="none"
-      stroke="currentColor"
-    >
-      <circle cx="11" cy="11" r="8"></circle>
-      <path d="m21 21-4.3-4.3"></path>
-    </g>
-  </svg>
-  <input type="search" class="grow" placeholder="Search" />
-  <kbd class="kbd kbd-sm">⌘</kbd>
-  <kbd class="kbd kbd-sm">K</kbd>
-</label>
-    <div class="cards flex flex-wrap gap-6 justify-center"></div>
-    <script type="module" src="/src/main.js"></script>
+<body class="bg-gray-100 text-gray-900">
+
+
+    <div class="max-w-4xl mx-auto p-6">
+
+
+      <h1 class="text-4xl font-bold text-center mb-8">CheapShark Game Deals</h1>
+
+
+      <!-- Search Bar -->
+      <div class="mb-6 flex justify-center">
+        <input
+          id="search"
+          type="search"
+          placeholder="Search for games..."
+          class="w-full max-w-lg px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+
+      <!-- Cards Container -->
+      <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+
+      <!-- Error / No results -->
+      <p id="message" class="text-center text-gray-600 mt-6"></p>
+
+
+    </div>
+
+
+    <script type="module">
+      const container = document.querySelector("#cards");
+      const message = document.querySelector("#message");
+      const input = document.querySelector("#search");
+
+
+      async function getData(query) {
+        try {
+          const response = await fetch(
+            `https://www.cheapshark.com/api/1.0/games?title=${encodeURIComponent(query)}`
+          );
+
+
+          if (!response.ok) throw new Error("Network error");
+
+
+          const data = await response.json();
+          renderCards(data);
+        } catch (err) {
+          container.innerHTML = "";
+          message.textContent = "Error loading data. Please try again.";
+          console.error(err);
+        }
+      }
+
+
+      function renderCards(games) {
+        container.innerHTML = "";
+        message.textContent = "";
+
+
+        // If no results
+        if (!games || games.length === 0) {
+          message.textContent = "No games found.";
+          return;
+        }
+
+
+        games.forEach((game) => {
+          container.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div class="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
+              <img
+                src="${game.thumb}"
+                alt="${game.external} thumbnail"
+                class="w-full h-40 object-cover"
+              />
+              <div class="p-4 flex flex-col">
+                <h2 class="text-lg font-semibold mb-2 text-center">${game.external}</h2>
+                <p class="text-blue-600 font-bold text-center">$${game.cheapest}</p>
+                <a
+                  href="https://www.cheapshark.com/redirect?dealID=${game.cheapestDealID}"
+                  target="_blank"
+                  class="mt-3 inline-block text-center bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                >
+                  View Deal
+                </a>
+              </div>
+            </div>
+            `
+          );
+        });
+      }
+
+
+      // Debounce logic to prevent too many API calls
+      let timeout;
+      input.addEventListener("input", () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          getData(input.value);
+        }, 300);
+      });
+
+
+      // Initial load
+      getData("batman");
+    </script>
+
+
   </body>
 </html>
