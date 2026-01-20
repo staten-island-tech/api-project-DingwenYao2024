@@ -1,9 +1,15 @@
 import "./style.css";
 
-async function getData() {
+const input = document.querySelector("input[type='search']");
+const container = document.querySelector(".cards");
+
+// Fetch data from the API
+async function getData(query) {
   try {
     const response = await fetch(
-      "https://www.cheapshark.com/api/1.0/games?title=batman"
+      `https://www.cheapshark.com/api/1.0/games?title=${encodeURIComponent(
+        query
+      )}`
     );
 
     if (!response.ok) {
@@ -13,25 +19,50 @@ async function getData() {
     const data = await response.json();
     renderCards(data);
   } catch (error) {
-    console.error(error);
+    console.error("Fetch failed:", error);
+    container.innerHTML = `<p class="error">Error loading data. Try again later.</p>`;
   }
 }
 
+// Render game cards with images
 function renderCards(games) {
-  const container = document.querySelector(".cards");
+  container.innerHTML = ""; // Clear existing cards
+
+  if (!games || games.length === 0) {
+    container.innerHTML = `<p>No games found.</p>`;
+    return;
+  }
 
   games.forEach((game) => {
     container.insertAdjacentHTML(
       "beforeend",
       `
       <div class="card">
+        <img 
+          src="${game.thumb}" 
+          alt="${game.external} thumbnail" 
+          class="game-thumb"
+        />
         <h2 class="name">${game.external}</h2>
-        <p>Cheapest: $${game.cheapest}</p>
+        <p class="price">Cheapest: $${game.cheapest}</p>
+        <a href="https://www.cheapshark.com/redirect?dealID=${game.cheapestDealID}" 
+           target="_blank" class="deal-link">
+          View Deal
+        </a>
       </div>
       `
     );
   });
 }
 
+// Debounce search input so we don’t spam the API
+let timeout;
+input.addEventListener("input", () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    getData(input.value);
+  }, 300);
+});
 
-getData();
+// Initial load: show default results (e.g., “batman”)
+getData("batman");
